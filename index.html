@@ -222,21 +222,15 @@ var CONFIG = {
   libraryUrl: "Documents/03_GitHubCopilot/成果物提出_test", // テスト時は別フォルダ
   listItemType: "SP.Data.成果物リスト_testListItem", // アイテム作成/更新時の__metadata.type。本番リスト作成後に要再実測
   deadline: "2026-07-24",
-  version: "v1.0.0-demo"
+  version: "v1.0.0-demo",
+  demoMode: true // true: 常にデモモード / false: ドメインに関わらず実環境として動作
 };
 
 /* =========================================================
    1. デモモード判定
-   SharePointドメイン外(file: 含む)で開いた場合はデモモード
+   CONFIG.demoMode フラグで制御(ドメイン判定は行わない)
    ========================================================= */
-var DEMO_MODE = (function () {
-  try {
-    var siteHost = new URL(CONFIG.siteUrl).hostname;
-    return location.protocol === 'file:' || location.hostname !== siteHost;
-  } catch (e) {
-    return true;
-  }
-})();
+var DEMO_MODE = CONFIG.demoMode === false;
 
 var FILE_MAX_SIZE = 50 * 1024 * 1024; // 50MB
 var FILE_EXTENSIONS = { zip: '.zip', md: '.md', pptx: '.pptx' };
