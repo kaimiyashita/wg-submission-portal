@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カスタムスクリプト検証用</title>
+</head>
+<body>
+<h1 id="result">読み込み中...(スクリプトが実行されていません)</h1>
+<p>このページがダウンロードにならずブラウザにそのまま表示され、上のテキストが「スクリプト実行OK」に変われば、カスタムスクリプトが有効です。</p>
+<script>
+document.getElementById('result').textContent = 'スクリプト実行OK(' + new Date().toLocaleString('ja-JP') + ')';
+</script>
+</body>
+</html>
