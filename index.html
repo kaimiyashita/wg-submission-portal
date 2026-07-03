@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIコーディングWG 成果物提出ポータル</title>
+<style>
+  :root {
+    --color-primary: #2b6cb0;
+    --color-primary-dark: #1e4e8c;
+    --color-bg: #f4f6f8;
+    --color-card: #ffffff;
+    --color-border: #d9dee3;
+    --color-text: #1f2933;
+    --color-muted: #6b7785;
+    --color-danger: #c0392b;
+    --color-warning: #b7791f;
+    --color-warning-bg: #fdf3d8;
+    --color-complete: #2f855a;
+    --color-complete-bg: #e6f4ea;
+    --color-waiting: #b7791f;
+    --color-waiting-bg: #fdf3d8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+  a { color: var(--color-primary); }
+  header.topbar {
+    background: var(--color-primary-dark);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header.topbar .title { font-size: 1.15rem; font-weight: bold; cursor: pointer; }
+  header.topbar .deadline { font-size: 0.85rem; opacity: 0.9; }
+  .demo-banner {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e6c974;
+  }
+  main#app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .summary-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .summary-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    min-width: 140px;
+  }
+  .summary-card .num { font-size: 1.6rem; font-weight: bold; color: var(--color-primary); }
+  .summary-card .label { font-size: 0.8rem; color: var(--color-muted); }
+  .list-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .btn {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--color-primary-dark); }
+  .btn.secondary { background: #fff; color: var(--color-primary); border: 1px solid var(--color-primary); }
+  .btn.secondary:hover { background: #eef4fb; }
+  .btn:disabled { background: #b7c2cc; cursor: not-allowed; }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card .thumb {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  .card .body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .card .app-name { font-weight: bold; font-size: 1.05rem; }
+  .card .shimei { font-size: 0.85rem; color: var(--color-muted); }
+  .card .gaiyo {
+    font-size: 0.85rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .status-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+  .status-badge.complete { color: var(--color-complete); background: var(--color-complete-bg); }
+  .status-badge.waiting { color: var(--color-waiting); background: var(--color-waiting-bg); }
+  .card .actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+  .card .actions a { font-size: 0.85rem; }
+  .form-section, .detail-section {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .form-row { margin-bottom: 16px; }
+  .form-row label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
+  .form-row .required { color: var(--color-danger); font-size: 0.8rem; margin-left: 4px; }
+  .form-row input[type="text"],
+  .form-row textarea,
+  .form-row input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  .form-row textarea { resize: vertical; }
+  .form-note { font-size: 0.8rem; color: var(--color-muted); margin-top: 4px; margin-bottom: 6px; }
+  .form-error { font-size: 0.82rem; color: var(--color-danger); margin-top: 4px; }
+  .radio-inline { display: flex; gap: 16px; align-items: center; margin-bottom: 6px; }
+  .radio-inline label { font-weight: normal; display: flex; align-items: center; gap: 4px; }
+  .file-current { font-size: 0.82rem; color: var(--color-muted); margin-bottom: 6px; }
+  .pre-wrap { white-space: pre-wrap; word-break: break-word; }
+  .complete-screen { text-align: center; padding: 40px 20px; }
+  .complete-screen .icon { font-size: 3rem; color: var(--color-complete); }
+  .complete-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .error-box {
+    background: #fdecea;
+    border: 1px solid var(--color-danger);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .error-box .error-code { font-weight: bold; color: var(--color-danger); margin: 0 0 6px; }
+  .error-box .error-message { margin: 0 0 10px; }
+  .btn-copy { font-size: 0.82rem; padding: 6px 12px; }
+  .detail-header h1 { margin: 0 0 4px; }
+  .detail-meta { color: var(--color-muted); font-size: 0.9rem; margin-bottom: 10px; }
+  .detail-section h2 { font-size: 1.05rem; margin-top: 0; }
+  .slide-placeholder, .report-placeholder {
+    border: 1px dashed var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .markdown-body :first-child { margin-top: 0; }
+  .markdown-body pre { background: #f4f6f8; padding: 10px; border-radius: 6px; overflow-x: auto; }
+  .markdown-body code { background: #f4f6f8; padding: 1px 4px; border-radius: 4px; }
+  footer.footbar {
+    text-align: right;
+    padding: 10px 20px;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+  }
+  @media (max-width: 600px) {
+    main#app { padding: 12px; }
+    header.topbar { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="title" onclick="navigate('#/')">AIコーディングWG 成果物提出ポータル</div>
+  <div class="deadline" id="deadline-label"></div>
+</header>
+<div id="banner"></div>
+<main id="app"></main>
+<footer class="footbar" id="version-label"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<script>
+'use strict';
+
+/* =========================================================
+   0. CONFIG(環境切替はここだけ書き換える)
+   ========================================================= */
+var CONFIG = {
+  siteUrl: "https://tdcsoft.sharepoint.com/sites/AI-CRAIWG",
+  listName: "成果物リスト_test",            // テスト時は 成果物リスト_test
+  libraryUrl: "Documents/03_GitHubCopilot/成果物提出_test", // テスト時は別フォルダ
+  listItemType: "SP.Data.成果物リスト_testListItem", // アイテム作成/更新時の__metadata.type。本番リスト作成後に要再実測
+  deadline: "2026-07-24",
+  version: "v1.0.0-demo"
+};
+
+/* =========================================================
+   1. デモモード判定
+   SharePointドメイン外(file: 含む)で開いた場合はデモモード
+   ========================================================= */
+var DEMO_MODE = (function () {
+  try {
+    var siteHost = new URL(CONFIG.siteUrl).hostname;
+    return location.protocol === 'file:' || location.hostname !== siteHost;
+  } catch (e) {
+    return true;
+  }
+})();
+
+var FILE_MAX_SIZE = 50 * 1024 * 1024; // 50MB
+var FILE_EXTENSIONS = { zip: '.zip', md: '.md', pptx: '.pptx' };
+var NAME_FORBIDDEN_CHARS = /[\\\/:*?"<>|#%&{}~]/g;
+
+var DEMO_CURRENT_USER = { id: null, title: 'デモ太郎' };
+
+/* =========================================================
+   2. デモ用サンプルデータ
+   ステータス3パターン・レシピ有無・自分の投稿有無を再現
+   ========================================================= */
+var demoReportSamples = {
+  1: "# 議事録要約くん\n\n## 概要\nTeams会議の文字起こしから議事録を自動生成します。\n\n## 使い方\n1. 文字起こしテキストを貼り付け\n2. 「要約」ボタンを押す\n3. 担当者・期限つきの議事録が出力される\n\n```text\n入力: 会議の文字起こし\n出力: Markdown形式の議事録\n```\n",
+  2: "# COBOL差分ビジュアライザ\n\n新旧COBOLソースの差分をブロック単位で可視化するツールです。\n\n- 変更行のハイライト\n- COPY句展開後の比較にも対応\n",
+  4: "# 社内FAQ検索bot\n\n社内規程PDFを検索対象にしたQAボットです。\n\n## 構成\n- ベクトル検索 + LLM要約\n",
+  5: "# 見積書自動生成\n\n案件情報を入力すると見積書(Excel)を自動生成します。\n",
+  6: "# コードレビューアシスタント\n\nPull Requestの差分を読み込み、レビューコメント案を生成します。\n"
+};
+
+var demoSeq = 6;
+var DEMO_ITEMS = [
+  {
+    id: 1, title: '議事録要約くん', shimei: '山田太郎', author: '山田太郎',
+    gaiyo: 'Teams会議の文字起こしから議事録を自動生成するツールです。長文の会議内容を要点ごとに整理し、担当者と期限を抽出します。',
+    recipe: 'あなたは優秀な議事録作成者です。以下の会議文字起こしから、決定事項・担当者・期限を抽出してMarkdown形式で整理してください。\n\n# 制約\n- 発言者名は「氏名(役職)」の形式で記載\n- 未確定事項は「要確認」と明記',
+    created: '2026-06-10T09:00:00',
+    files: { zip: true, md: true, pptx: true }
+  },
+  {
+    id: 2, title: 'COBOL差分ビジュアライザ', shimei: '佐藤花子', author: '佐藤花子',
+    gaiyo: 'COBOLの新旧ソースをCOPY句展開後の状態で比較し、差分をブロック単位でハイライト表示するWebツールです。',
+    recipe: '差分比較のロジックはPythonのdifflibをベースに、COBOL特有の桁位置情報を保持したまま差分を出すようプロンプトで指示しています。',
+    created: '2026-06-15T14:30:00',
+    files: { zip: true, md: true, pptx: false }
+  },
+  {
+    id: 3, title: '申請書OCRチェッカー', shimei: '鈴木一郎', author: '鈴木一郎',
+    gaiyo: '紙の申請書をスキャンし、OCRで読み取った内容と入力データを突合してエラー箇所を指摘するツールです。',
+    recipe: '',
+    created: '2026-06-18T11:20:00',
+    files: { zip: true, md: false, pptx: true }
+  },
+  {
+    id: 4, title: '社内FAQ検索bot', shimei: 'デモ太郎', author: 'デモ太郎',
+    gaiyo: '社内規程やマニュアルPDFを検索対象にした質問応答ボットです。根拠となった資料へのリンクも返します。',
+    recipe: '検索結果の要約時は「資料名・該当ページ」を必ず本文中に明記させるよう指示しています。',
+    created: '2026-06-20T10:00:00',
+    files: { zip: true, md: true, pptx: true }
+  },
+  {
+    id: 5, title: '見積書自動生成', shimei: '高橋実', author: '高橋実',
+    gaiyo: '案件情報(工数・単価・条件)を入力するだけで、見積書のExcelファイルをフォーマット通りに自動生成します。',
+    recipe: '見積項目のテンプレートをExcelのセル位置ごと指定し、工数×単価の計算式もその場で埋め込ませています。',
+    created: '2026-06-22T16:45:00',
+    files: { zip: false, md: true, pptx: true }
+  },
+  {
+    id: 6, title: 'コードレビューアシスタント', shimei: 'デモ太郎', author: 'デモ太郎',
+    gaiyo: 'Pull Requestの差分を読み込み、命名・重複・簡素化の観点でレビューコメント案を生成します。',
+    recipe: '観点は「正確性」「重複/簡素化」「保守性」の3種類に固定し、それぞれ最大3件までに絞るよう指示しています。',
+    created: '2026-06-25T13:10:00',
+    files: { zip: true, md: true, pptx: false }
+  }
+];
+
+/* =========================================================
+   3. ユーティリティ
+   ========================================================= */
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeNameChars(str) {
+  return String(str == null ? '' : str).replace(NAME_FORBIDDEN_CHARS, '');
+}
+
+function formatDate(isoStr) {
+  if (!isoStr) return '';
+  var d = new Date(isoStr);
+  if (isNaN(d.getTime())) return '';
+  return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+}
+
+var FILE_LABELS = { zip: 'ソース', md: 'レポート', pptx: 'スライド' };
+
+function getStatus(files) {
+  var missing = ['zip', 'md', 'pptx'].filter(function (key) { return !files[key]; }).map(function (key) { return FILE_LABELS[key]; });
+  if (missing.length === 0) return { label: '提出完了', cls: 'complete' };
+  return { label: missing.join('・') + '待ち', cls: 'waiting' };
+}
+
+function getFolderName(shimei, id) {
+  var cleanName = sanitizeNameChars(shimei) || '不明';
+  var idStr = String(id).padStart(3, '0');
+  return cleanName + '_' + idStr;
+}
+
+function placeholderColor(name) {
+  var s = String(name || '');
+  var hash = 0;
+  for (var i = 0; i < s.length; i++) { hash = (hash * 31 + s.charCodeAt(i)) % 360; }
+  return 'hsl(' + hash + ', 55%, 55%)';
+}
+
+var REAL_ITEMS = null;
+var REAL_CURRENT_USER = null;
+var REAL_DATA_LOADING = false;
+var REAL_DATA_ERROR = null;
+
+function getItems() {
+  return DEMO_MODE ? DEMO_ITEMS : (REAL_ITEMS || []);
+}
+
+function getCurrentUser() {
+  return DEMO_MODE ? DEMO_CURRENT_USER : (REAL_CURRENT_USER || { id: null, title: '' });
+}
+
+function findItem(id) {
+  var numId = Number(id);
+  var items = getItems();
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].id === numId) return items[i];
+  }
+  return null;
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  return Promise.reject(new Error('clipboard API unavailable'));
+}
+
+var LAST_ERROR_TEXT = '';
+function renderErrorBox(code, message) {
+  LAST_ERROR_TEXT = 'エラーコード: ' + code + ' / ' + message;
+  return '<div class="error-box" role="alert">' +
+    '<p class="error-code">エラーコード: ' + escapeHtml(code) + '</p>' +
+    '<p class="error-message">' + escapeHtml(message) + '</p>' +
+    '<button type="button" class="btn secondary btn-copy" onclick="copyErrorText()">エラー内容をコピー</button>' +
+    '</div>';
+}
+function copyErrorText() {
+  copyToClipboard(LAST_ERROR_TEXT).then(function () {
+    alert('コピーしました。報告用にお使いください。');
+  }).catch(function () {
+    alert('コピーに失敗しました。お手数ですが画面のエラーコードを手入力してください。\n' + LAST_ERROR_TEXT);
+  });
+}
+
+function renderMarkdown(mdText) {
+  if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+    try {
+      var rawHtml = marked.parse(mdText || '');
+      var clean = DOMPurify.sanitize(rawHtml);
+      return '<div class="markdown-body">' + clean + '</div>';
+    } catch (e) {
+      // 解析失敗時は下のフォールバックへ
+    }
+  }
+  return '<pre class="markdown-fallback">' + escapeHtml(mdText || '') + '</pre>';
+}
+
+/* =========================================================
+   3.5 SharePoint REST API層(Phase 2)
+   書き込み系はX-RequestDigest必須、全リクエストsame-origin
+   ========================================================= */
+function SpError(code, message) {
+  this.code = code;
+  this.message = message;
+}
+
+function apiUrl(path) {
+  return CONFIG.siteUrl + path;
+}
+
+function getSitePath() {
+  return new URL(CONFIG.siteUrl).pathname;
+}
+
+function getLibraryServerRelativeUrl() {
+  return getSitePath() + '/' + CONFIG.libraryUrl;
+}
+
+function getFolderServerRelativeUrl(folderName) {
+  return getLibraryServerRelativeUrl() + '/' + folderName;
+}
+
+function spRequest(path, options) {
+  options = options || {};
+  var headers = Object.assign({ 'Accept': 'application/json;odata=verbose' }, options.headers || {});
+  return fetch(apiUrl(path), {
+    method: options.method || 'GET',
+    credentials: 'same-origin',
+    headers: headers,
+    body: options.body
+  }).then(function (res) {
+    if (!res.ok) {
+      throw new SpError('HTTP_' + res.status, 'SharePointとの通信でエラーが発生しました(HTTP ' + res.status + ')');
+    }
+    return res;
+  }).catch(function (err) {
+    if (err instanceof SpError) throw err;
+    throw new SpError('NETWORK_ERROR', 'ネットワークエラーが発生しました。接続状況を確認して再度お試しください。');
+  });
+}
+
+var digestCache = { value: null, expiresAt: 0 };
+
+function getDigest() {
+  if (digestCache.value && Date.now() < digestCache.expiresAt) {
+    return Promise.resolve(digestCache.value);
+  }
+  return spRequest('/_api/contextinfo', { method: 'POST' })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      var info = data.d.GetContextWebInformation;
+      digestCache.value = info.FormDigestValue;
+      digestCache.expiresAt = Date.now() + (info.FormDigestTimeoutSeconds - 30) * 1000;
+      return digestCache.value;
+    });
+}
+
+function fetchCurrentUser() {
+  return spRequest('/_api/web/currentuser')
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      return { id: data.d.Id, title: data.d.Title, loginName: data.d.LoginName };
+    })
+    .catch(function () {
+      return { id: null, title: '', loginName: '' };
+    });
+}
+
+function listFolderFiles(folderUrl) {
+  if (!folderUrl) return Promise.resolve({ zip: false, md: false, pptx: false });
+  return spRequest("/_api/web/GetFolderByServerRelativeUrl('" + encodeURIComponent(folderUrl) + "')/Files?$select=Name")
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      var names = data.d.results.map(function (f) { return f.Name; });
+      return {
+        zip: names.indexOf('source.zip') !== -1,
+        md: names.indexOf('report.md') !== -1,
+        pptx: names.indexOf('slides.pptx') !== -1
+      };
+    })
+    .catch(function () { return { zip: false, md: false, pptx: false }; });
+}
+
+function fetchListItems() {
+  var qs = "$select=Id,Title,Shimei,Gaiyo,Recipe,FolderUrl,Author/Title,Author/Id,Created&$expand=Author&$orderby=Created desc&$top=200";
+  return spRequest("/_api/web/lists/getbytitle('" + encodeURIComponent(CONFIG.listName) + "')/items?" + qs)
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      var rawItems = data.d.results;
+      return Promise.all(rawItems.map(function (raw) {
+        return listFolderFiles(raw.FolderUrl).then(function (files) {
+          return {
+            id: raw.Id,
+            title: raw.Title || '',
+            shimei: raw.Shimei || '',
+            gaiyo: raw.Gaiyo || '',
+            recipe: raw.Recipe || '',
+            folderUrl: raw.FolderUrl || '',
+            author: raw.Author ? raw.Author.Title : '',
+            authorId: raw.Author ? raw.Author.Id : null,
+            created: raw.Created,
+            files: files
+          };
+        });
+      }));
+    });
+}
+
+function createListItem(fields) {
+  return getDigest().then(function (digest) {
+    var body = Object.assign({ __metadata: { type: CONFIG.listItemType } }, fields);
+    return spRequest("/_api/web/lists/getbytitle('" + encodeURIComponent(CONFIG.listName) + "')/items", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json;odata=verbose', 'X-RequestDigest': digest },
+      body: JSON.stringify(body)
+    });
+  }).then(function (res) { return res.json(); }).then(function (data) { return data.d; });
+}
+
+function updateListItem(id, fields) {
+  return getDigest().then(function (digest) {
+    var body = Object.assign({ __metadata: { type: CONFIG.listItemType } }, fields);
+    return spRequest("/_api/web/lists/getbytitle('" + encodeURIComponent(CONFIG.listName) + "')/items(" + id + ")", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;odata=verbose',
+        'X-RequestDigest': digest,
+        'X-HTTP-Method': 'MERGE',
+        'IF-MATCH': '*'
+      },
+      body: JSON.stringify(body)
+    });
+  });
+}
+
+function ensureFolder(folderServerRelativeUrl) {
+  return getDigest().then(function (digest) {
+    return spRequest('/_api/web/folders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json;odata=verbose', 'X-RequestDigest': digest },
+      body: JSON.stringify({ __metadata: { type: 'SP.Folder' }, ServerRelativeUrl: folderServerRelativeUrl })
+    });
+  }).catch(function () {
+    // 既にフォルダが存在する場合もエラーになりうるため、握りつぶして続行(冪等性要件)
+    return null;
+  });
+}
+
+function uploadFile(folderServerRelativeUrl, fileName, file) {
+  return getDigest().then(function (digest) {
+    return file.arrayBuffer().then(function (buffer) {
+      return spRequest(
+        "/_api/web/GetFolderByServerRelativeUrl('" + encodeURIComponent(folderServerRelativeUrl) + "')/Files/add(url='" + encodeURIComponent(fileName) + "',overwrite=true)",
+        {
+          method: 'POST',
+          headers: { 'X-RequestDigest': digest },
+          body: buffer
+        }
+      );
+    });
+  }).then(function (res) { return res.json(); }).then(function (data) { return data.d; });
+}
+
+function getFileText(fileServerRelativeUrl) {
+  return spRequest("/_api/web/GetFileByServerRelativeUrl('" + encodeURIComponent(fileServerRelativeUrl) + "')/$value", {
+    headers: { 'Accept': 'text/plain' }
+  }).then(function (res) { return res.text(); });
+}
+
+/* =========================================================
+   4. ルーター
+   #/            一覧
+   #/submit      提出フォーム
+   #/app/{ID}    詳細
+   #/edit/{ID}   編集
+   ========================================================= */
+function parseHash() {
+  var hash = location.hash || '#/';
+  var path = hash.replace(/^#/, '');
+  if (path === '' || path === '/') return { name: 'list' };
+  if (path === '/submit') return { name: 'submit' };
+  var appMatch = path.match(/^\/app\/(\d+)$/);
+  if (appMatch) return { name: 'detail', id: appMatch[1] };
+  var editMatch = path.match(/^\/edit\/(\d+)$/);
+  if (editMatch) return { name: 'edit', id: editMatch[1] };
+  return { name: 'notfound' };
+}
+
+function navigate(hash) {
+  if (location.hash === hash) { render(); }
+  else { location.hash = hash; }
+}
+
+function ensureRealDataLoaded(callback) {
+  if (REAL_ITEMS !== null && REAL_CURRENT_USER !== null) { callback(); return; }
+  if (REAL_DATA_LOADING) return;
+  REAL_DATA_LOADING = true;
+  Promise.all([fetchListItems(), fetchCurrentUser()]).then(function (results) {
+    REAL_ITEMS = results[0];
+    REAL_CURRENT_USER = results[1];
+    REAL_DATA_LOADING = false;
+    callback();
+  }).catch(function (err) {
+    REAL_DATA_LOADING = false;
+    REAL_DATA_ERROR = err instanceof SpError ? err : new SpError('LOAD_FAILED', 'データの取得に失敗しました。');
+    callback();
+  });
+}
+
+function retryLoad() {
+  REAL_DATA_ERROR = null;
+  REAL_ITEMS = null;
+  REAL_CURRENT_USER = null;
+  render();
+}
+
+function render() {
+  document.getElementById('deadline-label').textContent = '提出期限: ' + CONFIG.deadline;
+  document.getElementById('version-label').textContent = CONFIG.version;
+  renderBanner();
+  var route = parseHash();
+  var app = document.getElementById('app');
+
+  if (!DEMO_MODE) {
+    if (REAL_DATA_ERROR) {
+      app.innerHTML = renderErrorBox(REAL_DATA_ERROR.code, REAL_DATA_ERROR.message) +
+        '<p><button type="button" class="btn" onclick="retryLoad()">再読み込み</button></p>';
+      return;
+    }
+    if (REAL_ITEMS === null || REAL_CURRENT_USER === null) {
+      app.innerHTML = '<p>読み込み中...</p>';
+      ensureRealDataLoaded(render);
+      return;
+    }
+  }
+
+  if (route.name === 'list') app.innerHTML = renderListView();
+  else if (route.name === 'submit') app.innerHTML = renderFormView(null);
+  else if (route.name === 'detail') app.innerHTML = renderDetailView(route.id);
+  else if (route.name === 'edit') app.innerHTML = renderFormView(route.id);
+  else app.innerHTML = renderErrorBox('ROUTE_NOT_FOUND', '指定されたページが見つかりません。URLをご確認ください。') +
+    '<p><a href="#/" class="btn">一覧へ戻る</a></p>';
+  window.scrollTo(0, 0);
+  attachViewHandlers(route);
+
+  if (route.name === 'detail' && !DEMO_MODE) {
+    var detailItem = findItem(route.id);
+    if (detailItem && detailItem.files.md && detailItem.folderUrl) {
+      getFileText(detailItem.folderUrl + '/report.md').then(function (text) {
+        var container = document.getElementById('report-container');
+        if (container) container.outerHTML = renderMarkdown(text);
+      }).catch(function () {
+        var container = document.getElementById('report-container');
+        if (container) container.outerHTML = renderErrorBox('REPORT_LOAD_FAILED', 'レポートの取得に失敗しました。');
+      });
+    }
+  }
+}
+
+function renderBanner() {
+  var banner = document.getElementById('banner');
+  if (DEMO_MODE) {
+    banner.innerHTML = '<div class="demo-banner">デモモードで表示しています。サンプルデータで画面を確認できますが、実際のSharePointへの送信は行われません。</div>';
+  } else {
+    banner.innerHTML = '';
+  }
+}
+
+/* =========================================================
+   5. 一覧画面(#/)
+   ========================================================= */
+function renderListView() {
+  var items = getItems().slice().sort(function (a, b) { return new Date(b.created) - new Date(a.created); });
+  var totalApps = items.length;
+  var submitterSet = {};
+  items.forEach(function (it) {
+    submitterSet[it.shimei] = true;
+  });
+  var submitterCount = Object.keys(submitterSet).length;
+  var currentUser = getCurrentUser();
+
+  var cardsHtml = items.map(function (it) {
+    var status = getStatus(it.files);
+    var initials = (it.shimei || '?').slice(0, 1);
+    var isOwn = DEMO_MODE ? (it.author === currentUser.title) : (it.authorId != null && it.authorId === currentUser.id);
+    var gaiyoText = it.gaiyo && it.gaiyo.trim() !== '' ? escapeHtml(it.gaiyo) : '(アプリ概要は未登録です)';
+    return '' +
+      '<div class="card">' +
+        '<div class="thumb" style="background:' + placeholderColor(it.shimei) + '">' + escapeHtml(initials) + '</div>' +
+        '<div class="body">' +
+          '<span class="status-badge ' + status.cls + '">' + status.label + '</span>' +
+          '<div class="app-name">' + escapeHtml(it.title) + '</div>' +
+          '<div class="shimei">' + escapeHtml(it.shimei) + '</div>' +
+          '<div class="gaiyo">' + gaiyoText + '</div>' +
+          '<div class="actions">' +
+            '<a href="#/app/' + it.id + '">詳細を見る</a>' +
+            (isOwn ? '<a href="#/edit/' + it.id + '" class="btn secondary">編集</a>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+
+  return '' +
+    '<div class="summary-bar">' +
+      '<div class="summary-card"><div class="num">' + totalApps + '</div><div class="label">提出アプリ数</div></div>' +
+      '<div class="summary-card"><div class="num">' + submitterCount + '</div><div class="label">提出者数</div></div>' +
+    '</div>' +
+    '<div class="list-toolbar">' +
+      '<h1 style="margin:0;font-size:1.2rem;">成果物一覧</h1>' +
+      '<a href="#/submit" class="btn">＋ 成果物を提出する</a>' +
+    '</div>' +
+    '<div class="card-grid">' + (cardsHtml || '<p>まだ提出がありません。</p>') + '</div>';
+}
+
+/* =========================================================
+   6. 詳細画面(#/app/{ID})
+   ========================================================= */
+function renderDetailView(idStr) {
+  var item = findItem(idStr);
+  if (!item) {
+    return renderErrorBox('APP_NOT_FOUND', '指定されたアプリが見つかりません。削除されたか、URLが誤っている可能性があります。') +
+      '<p><a href="#/" class="btn">一覧へ戻る</a></p>';
+  }
+  var status = getStatus(item.files);
+
+  var reportHtml;
+  if (item.files.md) {
+    if (DEMO_MODE) {
+      var mdSample = demoReportSamples[item.id] || ('# ' + item.title + '\n\n(レポート本文のサンプルはありません)');
+      reportHtml = renderMarkdown(mdSample);
+    } else {
+      reportHtml = '<div id="report-container" class="report-placeholder">レポートを読み込んでいます...</div>';
+    }
+  } else {
+    reportHtml = '<div class="report-placeholder">report.md が未提出です</div>';
+  }
+
+  var slideHtml;
+  if (item.files.pptx) {
+    slideHtml = '<div class="slide-placeholder">本番環境接続後、ここに Office Online でスライドがその場プレビュー表示されます。<br>(埋め込み不可の環境では「ビューアーで開く」リンクを表示します)</div>';
+  } else {
+    slideHtml = '<div class="slide-placeholder">slides.pptx は未提出です(任意・後日提出可)</div>';
+  }
+
+  var folderName = getFolderName(item.shimei, item.id);
+
+  return '' +
+    '<div class="detail-section detail-header">' +
+      '<h1>' + escapeHtml(item.title) + '</h1>' +
+      '<div class="detail-meta">氏名: ' + escapeHtml(item.shimei) + ' ／ 提出日: ' + formatDate(item.created) + '</div>' +
+      '<span class="status-badge ' + status.cls + '">' + status.label + '</span>' +
+    '</div>' +
+    '<div class="detail-section">' +
+      '<h2>アプリ概要</h2>' +
+      (item.gaiyo && item.gaiyo.trim() !== ''
+        ? '<div class="pre-wrap">' + escapeHtml(item.gaiyo) + '</div>'
+        : '<p style="color:var(--color-muted);">(アプリ概要は未登録です)</p>') +
+    '</div>' +
+    '<div class="detail-section">' +
+      '<h2>プロンプトのレシピ</h2>' +
+      (item.recipe && item.recipe.trim() !== ''
+        ? '<div class="pre-wrap">' + escapeHtml(item.recipe) + '</div>'
+        : '<p style="color:var(--color-muted);">(レシピの登録はありません)</p>') +
+    '</div>' +
+    '<div class="detail-section">' +
+      '<h2>レポート</h2>' + reportHtml +
+    '</div>' +
+    '<div class="detail-section">' +
+      '<h2>スライド</h2>' + slideHtml +
+    '</div>' +
+    '<div class="detail-section">' +
+      '<h2>提出フォルダ</h2>' +
+      '<p>フォルダ名: <code>' + escapeHtml(folderName) + '</code></p>' +
+      (DEMO_MODE
+        ? '<p style="color:var(--color-muted);font-size:0.85rem;">(デモモードのため実リンクは無効です。本番接続後、ここから source.zip 等をダウンロードできます)</p>'
+        : (item.folderUrl ? '<p><a href="' + escapeHtml(item.folderUrl) + '" target="_blank" rel="noopener">提出フォルダを開く</a></p>' : '<p style="color:var(--color-muted);font-size:0.85rem;">フォルダは未作成です</p>')) +
+    '</div>' +
+    '<p><a href="#/" class="btn secondary">一覧へ戻る</a></p>';
+}
+
+/* =========================================================
+   7. 提出フォーム / 編集画面(#/submit, #/edit/{ID})
+   ========================================================= */
+function renderFormView(editId) {
+  var editItem = editId ? findItem(editId) : null;
+  if (editId && !editItem) {
+    return renderErrorBox('APP_NOT_FOUND', '編集対象のアプリが見つかりません。') +
+      '<p><a href="#/" class="btn">一覧へ戻る</a></p>';
+  }
+  var isEdit = !!editItem;
+  var shimeiValue = isEdit ? editItem.shimei : getCurrentUser().title;
+
+  var FILE_NOTES = {
+    zip: 'APIキー等のシークレットは必ず除いてください。上限50MB。',
+    md: '開発を通じて発見したこと・気づき・理解したことをまとめたライトなレポート(Markdown形式)。詳細画面でプレビュー表示されます。',
+    pptx: 'レポートをサクッとまとめたスライド(3〜4ページ想定)。'
+  };
+
+  function fileRow(fieldKey, label, currentPresent) {
+    var note = '<div class="form-note">' + FILE_NOTES[fieldKey] + '</div>';
+    if (!isEdit) {
+      return '' +
+        '<div class="form-row">' +
+          '<label>' + label + '</label>' +
+          note +
+          '<input type="file" name="' + fieldKey + '" id="file-' + fieldKey + '" accept="' + FILE_EXTENSIONS[fieldKey] + '">' +
+          '<div class="form-error" id="err-' + fieldKey + '"></div>' +
+        '</div>';
+    }
+    return '' +
+      '<div class="form-row">' +
+        '<label>' + label + '</label>' +
+        note +
+        '<div class="file-current">現在: ' + (currentPresent ? '提出済み' : '未提出') + '</div>' +
+        '<div class="radio-inline">' +
+          '<label><input type="radio" name="' + fieldKey + 'Action" value="keep" checked> 変更しない</label>' +
+          '<label><input type="radio" name="' + fieldKey + 'Action" value="replace"> 差し替える</label>' +
+        '</div>' +
+        '<input type="file" name="' + fieldKey + '" id="file-' + fieldKey + '" accept="' + FILE_EXTENSIONS[fieldKey] + '" disabled>' +
+        '<div class="form-error" id="err-' + fieldKey + '"></div>' +
+      '</div>';
+  }
+
+  return '' +
+    '<div class="form-section">' +
+      '<h1 style="margin-top:0;font-size:1.2rem;">' + (isEdit ? '成果物を編集' : '成果物を提出') + '</h1>' +
+      '<p class="form-note" style="margin-bottom:16px;">' + (isEdit
+        ? 'ファイルを差し替えると元のファイルは復元できません'
+        : '必須は氏名とアプリ名だけです。他の項目とファイルは、後日このポータルの編集画面からいつでも追記・追加できます。まずは登録だけでもOKです。') + '</p>' +
+      '<form id="submission-form" novalidate>' +
+        (isEdit ? '<input type="hidden" name="editId" value="' + editItem.id + '">' : '') +
+        '<div class="form-row">' +
+          '<label>氏名<span class="required">必須</span></label>' +
+          '<div class="form-note">ログインユーザーから自動入力されます。初回提出後は変更できません。</div>' +
+          '<input type="text" name="shimei" value="' + escapeHtml(shimeiValue) + '" ' + (isEdit ? 'disabled' : '') + '>' +
+          '<div class="form-error" id="err-shimei"></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<label>アプリ名<span class="required">必須</span></label>' +
+          '<input type="text" name="title" value="' + (isEdit ? escapeHtml(editItem.title) : '') + '">' +
+          '<div class="form-error" id="err-title"></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<label>アプリ概要</label>' +
+          '<div class="form-note">どんなことができるアプリかを書いてください。READMEの流用OK。</div>' +
+          '<textarea name="gaiyo" rows="8">' + (isEdit ? escapeHtml(editItem.gaiyo) : '') + '</textarea>' +
+          '<div class="form-error" id="err-gaiyo"></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<label>プロンプトのレシピ</label>' +
+          '<div class="form-note">「これは使えた!」というお気に入りプロンプトの具体例を書いてください。</div>' +
+          '<textarea name="recipe" rows="6">' + (isEdit ? escapeHtml(editItem.recipe) : '') + '</textarea>' +
+          '<div class="form-error" id="err-recipe"></div>' +
+        '</div>' +
+        fileRow('zip', 'ソースコード(zip)', isEdit ? editItem.files.zip : false) +
+        fileRow('md', 'レポート(md)', isEdit ? editItem.files.md : false) +
+        fileRow('pptx', '発表資料(pptx)', isEdit ? editItem.files.pptx : false) +
+        '<button type="submit" class="btn" id="submit-btn">' + (isEdit ? '更新する' : '送信する') + '</button>' +
+      '</form>' +
+    '</div>';
+}
+
+function renderCompleteScreen() {
+  return '' +
+    '<div class="form-section complete-screen">' +
+      '<div class="icon">✓</div>' +
+      '<h1>提出が完了しました</h1>' +
+      '<p>ご提出ありがとうございました。引き続き別のアプリを提出することもできます。</p>' +
+      '<div class="complete-actions">' +
+        '<button type="button" class="btn" onclick="startAnotherSubmission()">続けて別のアプリを提出</button>' +
+        '<a href="#/" class="btn secondary">一覧を見る</a>' +
+      '</div>' +
+    '</div>';
+}
+
+function startAnotherSubmission() {
+  document.getElementById('app').innerHTML = renderFormView(null);
+  if (location.hash !== '#/submit') { history.replaceState(null, '', '#/submit'); }
+  attachViewHandlers({ name: 'submit' });
+}
+
+/* =========================================================
+   8. イベントハンドラ(フォーム関連)
+   ========================================================= */
+function attachViewHandlers(route) {
+  if (route.name !== 'submit' && route.name !== 'edit') return;
+  var form = document.getElementById('submission-form');
+  if (!form) return;
+
+  ['zip', 'md', 'pptx'].forEach(function (key) {
+    var radios = form.querySelectorAll('input[name="' + key + 'Action"]');
+    if (!radios.length) return;
+    var fileInput = document.getElementById('file-' + key);
+    radios.forEach(function (r) {
+      r.addEventListener('change', function () {
+        fileInput.disabled = (r.value === 'keep' && r.checked) ? true : fileInput.disabled;
+      });
+    });
+    form.querySelectorAll('input[name="' + key + 'Action"]').forEach(function (r) {
+      r.addEventListener('change', function (e) {
+        fileInput.disabled = e.target.value !== 'replace';
+        if (fileInput.disabled) fileInput.value = '';
+      });
+    });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    handleFormSubmit(form, route);
+  });
+}
+
+function clearFormErrors(form) {
+  form.querySelectorAll('.form-error').forEach(function (el) { el.textContent = ''; });
+}
+
+function setFieldError(fieldKey, message) {
+  var el = document.getElementById('err-' + fieldKey);
+  if (el) el.textContent = message;
+}
+
+function handleFormSubmit(form, route) {
+  clearFormErrors(form);
+  var data = new FormData(form);
+  var isEdit = route.name === 'edit';
+  var hasError = false;
+
+  var shimei = String(data.get('shimei') || '').trim();
+  var title = String(data.get('title') || '').trim();
+  var gaiyo = String(data.get('gaiyo') || '').trim();
+  var recipe = String(data.get('recipe') || '');
+
+  if (!isEdit && shimei === '') { setFieldError('shimei', '氏名を入力してください'); hasError = true; }
+  if (title === '') { setFieldError('title', 'アプリ名を入力してください'); hasError = true; }
+
+  function checkFile(key, isReplace) {
+    var file = data.get(key);
+    var hasFile = file && file.size > 0;
+    var ext = FILE_EXTENSIONS[key];
+    if (hasFile && file.name.toLowerCase().slice(-ext.length) !== ext) {
+      setFieldError(key, ext + '形式のファイルを選択してください');
+      hasError = true;
+      return null;
+    }
+    if (hasFile && file.size > FILE_MAX_SIZE) {
+      setFieldError(key, 'ファイルが大きすぎます(上限50MB)。node_modules等の依存フォルダが含まれていないか確認してください。');
+      hasError = true;
+      return null;
+    }
+    if (isEdit && isReplace && !hasFile) {
+      setFieldError(key, '差し替える場合はファイルを選択してください');
+      hasError = true;
+    }
+    return hasFile ? file : null;
+  }
+
+  var zipAction = isEdit ? String(data.get('zipAction') || 'keep') : 'replace';
+  var mdAction = isEdit ? String(data.get('mdAction') || 'keep') : 'replace';
+  var pptxAction = isEdit ? String(data.get('pptxAction') || 'keep') : 'replace';
+
+  var zipFile = checkFile('zip', zipAction === 'replace');
+  var mdFile = checkFile('md', mdAction === 'replace');
+  var pptxFile = checkFile('pptx', pptxAction === 'replace');
+
+  if (hasError) return;
+
+  var cleanShimei = sanitizeNameChars(shimei);
+  var cleanTitle = sanitizeNameChars(title);
+
+  if (DEMO_MODE) {
+    if (isEdit) {
+      var item = findItem(data.get('editId'));
+      item.title = cleanTitle;
+      item.gaiyo = gaiyo;
+      item.recipe = recipe;
+      if (zipAction === 'replace' && zipFile) item.files.zip = true;
+      if (mdAction === 'replace' && mdFile) item.files.md = true;
+      if (pptxAction === 'replace' && pptxFile) item.files.pptx = true;
+      navigate('#/app/' + item.id);
+      return;
+    }
+
+    demoSeq += 1;
+    var newItem = {
+      id: demoSeq,
+      title: cleanTitle,
+      shimei: cleanShimei,
+      author: cleanShimei,
+      gaiyo: gaiyo,
+      recipe: recipe,
+      created: new Date().toISOString(),
+      files: { zip: !!zipFile, md: !!mdFile, pptx: !!pptxFile }
+    };
+    DEMO_ITEMS.unshift(newItem);
+    document.getElementById('app').innerHTML = renderCompleteScreen();
+    return;
+  }
+
+  submitToSharePoint(isEdit, data.get('editId'), { cleanShimei: cleanShimei, cleanTitle: cleanTitle, gaiyo: gaiyo, recipe: recipe },
+    { zipAction: zipAction, mdAction: mdAction, pptxAction: pptxAction, zipFile: zipFile, mdFile: mdFile, pptxFile: pptxFile });
+}
+
+function submitToSharePoint(isEdit, editId, fields, fileState) {
+  var submitBtn = document.getElementById('submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = isEdit ? '更新中...' : '送信中...'; }
+
+  var existing = isEdit ? findItem(editId) : null;
+  var itemFields = { Title: fields.cleanTitle, Gaiyo: fields.gaiyo, Recipe: fields.recipe };
+  var createdItemId = isEdit ? existing.id : null;
+
+  var itemPromise = isEdit
+    ? updateListItem(existing.id, itemFields).then(function () { return existing.id; })
+    : createListItem(Object.assign({ Shimei: fields.cleanShimei }, itemFields)).then(function (created) {
+        createdItemId = created.Id;
+        return created.Id;
+      });
+
+  itemPromise.then(function (itemId) {
+    var finalShimei = isEdit ? existing.shimei : fields.cleanShimei;
+    var folderUrl = (existing && existing.folderUrl) || getFolderServerRelativeUrl(getFolderName(finalShimei, itemId));
+
+    return ensureFolder(folderUrl).then(function () {
+      var uploads = [];
+      if (fileState.zipAction === 'replace' && fileState.zipFile) uploads.push(uploadFile(folderUrl, 'source.zip', fileState.zipFile).then(function () { return 'zip'; }));
+      if (fileState.mdAction === 'replace' && fileState.mdFile) uploads.push(uploadFile(folderUrl, 'report.md', fileState.mdFile).then(function () { return 'md'; }));
+      if (fileState.pptxAction === 'replace' && fileState.pptxFile) uploads.push(uploadFile(folderUrl, 'slides.pptx', fileState.pptxFile).then(function () { return 'pptx'; }));
+      return Promise.all(uploads).then(function (uploadedKeys) {
+        return updateListItem(itemId, { FolderUrl: folderUrl }).then(function () {
+          return { itemId: itemId, folderUrl: folderUrl, uploadedKeys: uploadedKeys };
+        });
+      });
+    });
+  }).then(function (result) {
+    var prevFiles = existing ? existing.files : { zip: false, md: false, pptx: false };
+    var newFiles = {
+      zip: prevFiles.zip || result.uploadedKeys.indexOf('zip') !== -1,
+      md: prevFiles.md || result.uploadedKeys.indexOf('md') !== -1,
+      pptx: prevFiles.pptx || result.uploadedKeys.indexOf('pptx') !== -1
+    };
+    if (isEdit) {
+      existing.title = fields.cleanTitle;
+      existing.gaiyo = fields.gaiyo;
+      existing.recipe = fields.recipe;
+      existing.folderUrl = result.folderUrl;
+      existing.files = newFiles;
+      navigate('#/app/' + existing.id);
+    } else {
+      var currentUser = getCurrentUser();
+      var newItem = {
+        id: result.itemId,
+        title: fields.cleanTitle,
+        shimei: fields.cleanShimei,
+        author: currentUser.title,
+        authorId: currentUser.id,
+        gaiyo: fields.gaiyo,
+        recipe: fields.recipe,
+        created: new Date().toISOString(),
+        folderUrl: result.folderUrl,
+        files: newFiles
+      };
+      if (REAL_ITEMS) REAL_ITEMS.unshift(newItem);
+      document.getElementById('app').innerHTML = renderCompleteScreen();
+    }
+  }).catch(function (err) {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = isEdit ? '更新する' : '送信する'; }
+    var code = (err && err.code) || 'SUBMIT_FAILED';
+    var message = (err && err.message) || '送信に失敗しました。時間をおいて再度お試しください。';
+    if (createdItemId != null && !isEdit) {
+      message += ' アプリ自体は登録済みのため、一覧から編集画面を開いて続きを入力してください。';
+    }
+    document.getElementById('app').insertAdjacentHTML('afterbegin', renderErrorBox(code, message));
+    window.scrollTo(0, 0);
+  });
+}
+
+/* =========================================================
+   9. 起動
+   ========================================================= */
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
