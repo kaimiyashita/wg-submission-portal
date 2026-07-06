@@ -67,6 +67,16 @@ main#app {
 .summary-card .num { font-size: 1.6rem; font-weight: bold; color: var(--color-primary); }
 .summary-card .label { font-size: 0.8rem; color: var(--color-muted); }
 .list-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.my-shimei-box {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.my-shimei-box label { font-size: 0.85rem; font-weight: bold; }
+.my-shimei-row { display: flex; gap: 8px; margin-top: 6px; }
+.my-shimei-row input { flex: 1; padding: 6px 8px; border: 1px solid var(--color-border); border-radius: 6px; }
 .btn {
   display: inline-block;
   background: var(--color-primary);

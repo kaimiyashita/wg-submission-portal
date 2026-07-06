@@ -431,7 +431,23 @@ function renderListView() {
       '<h1 style="margin:0;font-size:1.2rem;">成果物一覧</h1>' +
       '<a href="#/submit" class="btn">＋ 成果物を提出する</a>' +
     '</div>' +
+    '<div class="my-shimei-box">' +
+      '<label for="my-shimei-input">自分の氏名(編集ボタン表示用)</label>' +
+      '<div class="my-shimei-row">' +
+        '<input type="text" id="my-shimei-input" value="' + escapeHtml(myShimei) + '" placeholder="提出時と同じ氏名">' +
+        '<button type="button" class="btn secondary" onclick="setMyShimeiFromInput()">設定</button>' +
+      '</div>' +
+      '<div class="form-note">自分の投稿の「編集」ボタンが表示されない場合、ここに提出時と同じ氏名を入力して「設定」を押してください。</div>' +
+    '</div>' +
     '<div class="card-grid">' + (cardsHtml || '<p>まだ提出がありません。</p>') + '</div>';
+}
+
+function setMyShimeiFromInput() {
+  var input = document.getElementById('my-shimei-input');
+  var name = (input && input.value ? input.value : '').trim();
+  if (!name) { return; }
+  saveLocalShimei(name);
+  render();
 }
 
 /* =========================================================
