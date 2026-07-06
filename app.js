@@ -456,9 +456,15 @@ function renderDetailView(idStr) {
 
   var slideHtml;
   if (item.files.pptx) {
-    slideHtml = DEMO_MODE
-      ? '<div class="slide-placeholder">本番環境接続後、ここからスライドを開けます。</div>'
-      : '<div class="slide-placeholder"><a href="' + escapeHtml(item.attachments.pptx) + '" target="_blank" rel="noopener">スライドを開く(SharePointにログイン済みの場合)</a></div>';
+    if (DEMO_MODE) {
+      slideHtml = '<div class="slide-placeholder">本番環境接続後、ここからスライドを開けます。</div>';
+    } else {
+      var pptxEmbedUrl = item.attachments.pptx + '?action=embedview';
+      slideHtml = '<div class="slide-embed">' +
+          '<iframe src="' + escapeHtml(pptxEmbedUrl) + '" width="100%" height="450" frameborder="0" allowfullscreen></iframe>' +
+        '</div>' +
+        '<div class="slide-fallback"><a href="' + escapeHtml(item.attachments.pptx) + '" target="_blank" rel="noopener">別タブで開く(SharePointにログイン済みの場合)</a></div>';
+    }
   } else {
     slideHtml = '<div class="slide-placeholder">slides.pptx は未提出です(任意・後日提出可)</div>';
   }

@@ -177,6 +177,18 @@ main#app {
   color: var(--color-muted);
   font-size: 0.9rem;
 }
+.slide-embed {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.slide-embed iframe { display: block; }
+.slide-fallback {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  color: var(--color-muted);
+}
 .markdown-body :first-child { margin-top: 0; }
 .markdown-body pre { background: #f4f6f8; padding: 10px; border-radius: 6px; overflow-x: auto; }
 .markdown-body code { background: #f4f6f8; padding: 1px 4px; border-radius: 4px; }
