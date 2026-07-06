@@ -426,14 +426,13 @@ function renderListView() {
     '<div class="summary-bar">' +
       '<div class="summary-card"><div class="num">' + totalApps + '</div><div class="label">提出アプリ数</div></div>' +
       '<div class="summary-card"><div class="num">' + submitterCount + '</div><div class="label">提出者数</div></div>' +
-    '</div>' +
-    '<div class="my-shimei-box">' +
-      '<label for="my-shimei-input">自分の氏名(編集ボタン表示用)</label>' +
-      '<div class="my-shimei-row">' +
-        '<input type="text" id="my-shimei-input" value="' + escapeHtml(myShimei) + '" placeholder="提出時と同じ氏名">' +
-        '<button type="button" class="btn secondary" onclick="setMyShimeiFromInput()">設定</button>' +
+      '<div class="summary-card my-shimei-box">' +
+        '<label for="my-shimei-input">自分の氏名(編集ボタン表示用)</label>' +
+        '<div class="my-shimei-row">' +
+          '<input type="text" id="my-shimei-input" value="' + escapeHtml(myShimei) + '" placeholder="提出時と同じ氏名" title="自分の投稿の「編集」ボタンが表示されない場合、提出時と同じ氏名を入力して「設定」を押してください。">' +
+          '<button type="button" class="btn secondary" onclick="setMyShimeiFromInput()">設定</button>' +
+        '</div>' +
       '</div>' +
-      '<div class="form-note">自分の投稿の「編集」ボタンが表示されない場合、ここに提出時と同じ氏名を入力して「設定」を押してください。</div>' +
     '</div>' +
     '<div class="list-toolbar">' +
       '<h1 style="margin:0;font-size:1.2rem;">成果物一覧</h1>' +
