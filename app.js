@@ -4,7 +4,7 @@
    0. CONFIG(環境切替はここだけ書き換える)
    ========================================================= */
 var CONFIG = {
-  submitFlowUrl: "https://defaultb002272c5b77459a82c753598c4aa5.11.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/adbe3f3d2ca04fbb8bb40bdad7b1feba/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Q73yJsX9-DnFf2mW9Q4a8QQmhVDVgTZZHKJYxJS5lgY",
+  submitFlowUrl: "https://defaultb002272c5b77459a82c753598c4aa5.11.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/24/workflows/b5b203b449c64f7fb70d4fe473d4798f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FBizjvKpSsO6nTLv8tvKMViOivpJ7mjPywpg11m7rIw",
   listFlowUrl: "https://defaultb002272c5b77459a82c753598c4aa5.11.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/028daf86462f486a96e132cdb5cbd1af/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IMuiZ5TfJ2rWTXqkwUcu0OPtFzZraqAi-zQPRWmx2kc",
   deadline: "2026-07-24",
   version: "v2.0.0-demo",
