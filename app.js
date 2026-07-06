@@ -1,5 +1,5 @@
 'use strict';
-/* redeploy trigger */
+/* redeploy trigger 2 */
 
 /* =========================================================
    0. CONFIG(環境切替はここだけ書き換える)
