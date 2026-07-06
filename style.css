@@ -73,6 +73,7 @@ main#app {
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
+  max-width: 300px;
 }
 .my-shimei-box label { font-size: 0.85rem; font-weight: bold; }
 .my-shimei-row { display: flex; gap: 8px; margin-top: 6px; }
