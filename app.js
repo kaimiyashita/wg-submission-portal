@@ -461,9 +461,10 @@ function renderDetailView(idStr) {
 
   var reportHtml;
   if (item.files.md) {
-    reportHtml = DEMO_MODE
-      ? '<div class="report-placeholder">本番環境接続後、ここからレポートを開けます。</div>'
-      : '<div class="report-placeholder"><a href="' + escapeHtml(item.attachments.md) + '" target="_blank" rel="noopener">レポートを開く(SharePointにログイン済みの場合)</a></div>';
+    var mdText = DEMO_MODE
+      ? (demoReportSamples[item.id] || ('# ' + item.title + '\n\n(レポート本文のサンプルはありません)'))
+      : item.reportText;
+    reportHtml = renderMarkdown(mdText);
   } else {
     reportHtml = '<div class="report-placeholder">report.md が未提出です</div>';
   }
