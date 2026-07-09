@@ -20,7 +20,6 @@ var DEMO_MODE = CONFIG.demoMode === true;
 
 var FILE_MAX_SIZE = 50 * 1024 * 1024; // 50MB
 var FILE_EXTENSIONS = { zip: '.zip', md: '.md', pptx: '.pptx' };
-var FILE_FIXED_NAMES = { zip: 'source.zip', md: 'report.md', pptx: 'slides.pptx' };
 var NAME_FORBIDDEN_CHARS = /[\\\/:*?"<>|#%&{}~]/g;
 
 var DEMO_CURRENT_USER = { title: 'デモ太郎' };
@@ -239,7 +238,7 @@ function submitToFlow(isEdit, editId, fields, fileState) {
   var conversions = ['zip', 'md', 'pptx'].map(function (key) {
     if (fileState[key + 'Action'] === 'replace' && fileState[key + 'File']) {
       return fileToBase64(fileState[key + 'File']).then(function (b64) {
-        fileEntries[key] = { name: FILE_FIXED_NAMES[key], base64: b64 };
+        fileEntries[key] = { name: sanitizeNameChars(fileState[key + 'File'].name), base64: b64 };
       });
     }
     return Promise.resolve();
