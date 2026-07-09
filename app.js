@@ -52,42 +52,36 @@ var DEMO_ITEMS = [
   {
     id: 1, title: '議事録要約くん', shimei: '山田太郎', author: '山田太郎',
     gaiyo: 'Teams会議の文字起こしから議事録を自動生成するツールです。長文の会議内容を要点ごとに整理し、担当者と期限を抽出します。',
-    recipe: 'あなたは優秀な議事録作成者です。以下の会議文字起こしから、決定事項・担当者・期限を抽出してMarkdown形式で整理してください。\n\n# 制約\n- 発言者名は「氏名(役職)」の形式で記載\n- 未確定事項は「要確認」と明記',
     created: '2026-06-10T09:00:00',
     files: { zip: true, md: true, pptx: true }
   },
   {
     id: 2, title: 'COBOL差分ビジュアライザ', shimei: '佐藤花子', author: '佐藤花子',
     gaiyo: 'COBOLの新旧ソースをCOPY句展開後の状態で比較し、差分をブロック単位でハイライト表示するWebツールです。',
-    recipe: '差分比較のロジックはPythonのdifflibをベースに、COBOL特有の桁位置情報を保持したまま差分を出すようプロンプトで指示しています。',
     created: '2026-06-15T14:30:00',
     files: { zip: true, md: true, pptx: false }
   },
   {
     id: 3, title: '申請書OCRチェッカー', shimei: '鈴木一郎', author: '鈴木一郎',
     gaiyo: '紙の申請書をスキャンし、OCRで読み取った内容と入力データを突合してエラー箇所を指摘するツールです。',
-    recipe: '',
     created: '2026-06-18T11:20:00',
     files: { zip: true, md: false, pptx: true }
   },
   {
     id: 4, title: '社内FAQ検索bot', shimei: 'デモ太郎', author: 'デモ太郎',
     gaiyo: '社内規程やマニュアルPDFを検索対象にした質問応答ボットです。根拠となった資料へのリンクも返します。',
-    recipe: '検索結果の要約時は「資料名・該当ページ」を必ず本文中に明記させるよう指示しています。',
     created: '2026-06-20T10:00:00',
     files: { zip: true, md: true, pptx: true }
   },
   {
     id: 5, title: '見積書自動生成', shimei: '高橋実', author: '高橋実',
     gaiyo: '案件情報(工数・単価・条件)を入力するだけで、見積書のExcelファイルをフォーマット通りに自動生成します。',
-    recipe: '見積項目のテンプレートをExcelのセル位置ごと指定し、工数×単価の計算式もその場で埋め込ませています。',
     created: '2026-06-22T16:45:00',
     files: { zip: false, md: true, pptx: true }
   },
   {
     id: 6, title: 'コードレビューアシスタント', shimei: 'デモ太郎', author: 'デモ太郎',
     gaiyo: 'Pull Requestの差分を読み込み、命名・重複・簡素化の観点でレビューコメント案を生成します。',
-    recipe: '観点は「正確性」「重複/簡素化」「保守性」の3種類に固定し、それぞれ最大3件までに絞るよう指示しています。',
     created: '2026-06-25T13:10:00',
     files: { zip: true, md: true, pptx: false }
   }
@@ -219,7 +213,6 @@ function fetchListData() {
         shimei: raw.shimei || '',
         author: raw.author || raw.shimei || '',
         gaiyo: raw.gaiyo || '',
-        recipe: raw.recipe || '',
         created: raw.created || '',
         attachments: attachments,
         files: { zip: !!attachments.zip, md: !!attachments.md, pptx: !!attachments.pptx },
@@ -251,7 +244,6 @@ function submitToFlow(isEdit, editId, fields, fileState) {
       shimei: fields.cleanShimei,
       title: fields.cleanTitle,
       gaiyo: fields.gaiyo,
-      recipe: fields.recipe,
       files: fileEntries
     };
     return fetch(CONFIG.submitFlowUrl, {
@@ -276,7 +268,6 @@ function submitToFlow(isEdit, editId, fields, fileState) {
     if (isEdit) {
       existing.title = fields.cleanTitle;
       existing.gaiyo = fields.gaiyo;
-      existing.recipe = fields.recipe;
       existing.files = newFiles;
       navigate('#/app/' + existing.id);
     } else {
@@ -286,7 +277,6 @@ function submitToFlow(isEdit, editId, fields, fileState) {
         shimei: fields.cleanShimei,
         author: fields.cleanShimei,
         gaiyo: fields.gaiyo,
-        recipe: fields.recipe,
         created: new Date().toISOString(),
         attachments: { zip: null, md: null, pptx: null },
         files: newFiles,
@@ -488,12 +478,6 @@ function renderDetailView(idStr) {
         : '<p style="color:var(--color-muted);">(アプリ概要は未登録です)</p>') +
     '</div>' +
     '<div class="detail-section">' +
-      '<h2>プロンプトのレシピ</h2>' +
-      (item.recipe && item.recipe.trim() !== ''
-        ? '<div class="pre-wrap">' + escapeHtml(item.recipe) + '</div>'
-        : '<p style="color:var(--color-muted);">(レシピの登録はありません)</p>') +
-    '</div>' +
-    '<div class="detail-section">' +
       '<h2>レポート</h2>' + reportHtml +
     '</div>' +
     '<div class="detail-section">' +
@@ -578,12 +562,6 @@ function renderFormView(editId) {
           '<textarea name="gaiyo" rows="8">' + (isEdit ? escapeHtml(editItem.gaiyo) : '') + '</textarea>' +
           '<div class="form-error" id="err-gaiyo"></div>' +
         '</div>' +
-        '<div class="form-row">' +
-          '<label>プロンプトのレシピ</label>' +
-          '<div class="form-note">「これは使えた!」というお気に入りプロンプトの具体例を書いてください。</div>' +
-          '<textarea name="recipe" rows="6">' + (isEdit ? escapeHtml(editItem.recipe) : '') + '</textarea>' +
-          '<div class="form-error" id="err-recipe"></div>' +
-        '</div>' +
         fileRow('zip', 'ソースコード(zip)', isEdit ? editItem.files.zip : false) +
         fileRow('md', 'レポート(md)', isEdit ? editItem.files.md : false) +
         fileRow('pptx', '発表資料(pptx)', isEdit ? editItem.files.pptx : false) +
@@ -655,7 +633,6 @@ function handleFormSubmit(form, route) {
   var shimei = String(data.get('shimei') || '').trim();
   var title = String(data.get('title') || '').trim();
   var gaiyo = String(data.get('gaiyo') || '').trim();
-  var recipe = String(data.get('recipe') || '');
 
   if (!isEdit && shimei === '') { setFieldError('shimei', '氏名を入力してください'); hasError = true; }
   if (title === '') { setFieldError('title', 'アプリ名を入力してください'); hasError = true; }
@@ -699,7 +676,6 @@ function handleFormSubmit(form, route) {
       var item = findItem(data.get('editId'));
       item.title = cleanTitle;
       item.gaiyo = gaiyo;
-      item.recipe = recipe;
       if (zipAction === 'replace' && zipFile) item.files.zip = true;
       if (mdAction === 'replace' && mdFile) item.files.md = true;
       if (pptxAction === 'replace' && pptxFile) item.files.pptx = true;
@@ -714,7 +690,6 @@ function handleFormSubmit(form, route) {
       shimei: cleanShimei,
       author: cleanShimei,
       gaiyo: gaiyo,
-      recipe: recipe,
       created: new Date().toISOString(),
         files: { zip: !!zipFile, md: !!mdFile, pptx: !!pptxFile }
     };
@@ -723,7 +698,7 @@ function handleFormSubmit(form, route) {
     return;
   }
 
-  submitToFlow(isEdit, data.get('editId'), { cleanShimei: cleanShimei, cleanTitle: cleanTitle, gaiyo: gaiyo, recipe: recipe },
+  submitToFlow(isEdit, data.get('editId'), { cleanShimei: cleanShimei, cleanTitle: cleanTitle, gaiyo: gaiyo },
     { zipAction: zipAction, mdAction: mdAction, pptxAction: pptxAction, zipFile: zipFile, mdFile: mdFile, pptxFile: pptxFile });
 }
 
