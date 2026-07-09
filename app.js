@@ -469,19 +469,10 @@ function renderDetailView(idStr) {
     reportHtml = '<div class="report-placeholder">report.md が未提出です</div>';
   }
 
-  var slideHtml;
-  if (item.files.pptx) {
-    slideHtml = DEMO_MODE
-      ? '<div class="slide-placeholder">本番環境接続後、ここからスライドを開けます。</div>'
-      : '<div class="slide-placeholder"><a href="' + escapeHtml(item.attachments.pptx) + '" target="_blank" rel="noopener">スライドを開く(SharePointにログイン済みの場合)</a></div>';
-  } else {
-    slideHtml = '<div class="slide-placeholder">slides.pptx は未提出です(任意・後日提出可)</div>';
-  }
-
   function attachmentLink(key, label) {
     if (!item.files[key]) return '<li>' + label + ': 未提出</li>';
     if (DEMO_MODE) return '<li>' + label + ': 提出済み(デモモードのため実リンクは無効です)</li>';
-    return '<li><a href="' + escapeHtml(item.attachments[key]) + '" target="_blank" rel="noopener">' + label + 'を開く</a>(SharePointにログイン済みの場合)</li>';
+    return '<li><a href="' + escapeHtml(item.attachments[key]) + '" target="_blank" rel="noopener">' + label + 'を開く</a></li>';
   }
 
   return '' +
@@ -506,15 +497,13 @@ function renderDetailView(idStr) {
       '<h2>レポート</h2>' + reportHtml +
     '</div>' +
     '<div class="detail-section">' +
-      '<h2>スライド</h2>' + slideHtml +
-    '</div>' +
-    '<div class="detail-section">' +
       '<h2>添付ファイル</h2>' +
       '<ul>' +
         attachmentLink('zip', 'ソースコード(zip)') +
         attachmentLink('md', 'レポート(md)') +
         attachmentLink('pptx', '発表資料(pptx)') +
       '</ul>' +
+      '<p style="color:var(--color-muted);">※リンクはSharePointにログイン済みの場合のみ開けます</p>' +
     '</div>' +
     '<p><a href="#/" class="btn secondary">一覧へ戻る</a></p>';
 }
