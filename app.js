@@ -472,12 +472,6 @@ function renderDetailView(idStr) {
       '<span class="status-badge ' + status.cls + '">' + status.label + '</span>' +
     '</div>' +
     '<div class="detail-section">' +
-      '<h2>アプリ概要</h2>' +
-      (item.gaiyo && item.gaiyo.trim() !== ''
-        ? '<div class="pre-wrap">' + escapeHtml(item.gaiyo) + '</div>'
-        : '<p style="color:var(--color-muted);">(アプリ概要は未登録です)</p>') +
-    '</div>' +
-    '<div class="detail-section">' +
       '<h2>レポート</h2>' + reportHtml +
     '</div>' +
     '<div class="detail-section">' +
@@ -540,7 +534,7 @@ function renderFormView(editId) {
       '<h1 style="margin-top:0;font-size:1.2rem;">' + (isEdit ? '成果物を編集' : '成果物を提出') + '</h1>' +
       '<p class="form-note" style="margin-bottom:16px;">' + (isEdit
         ? 'ファイルを差し替えると元のファイルは復元できません'
-        : '必須は氏名とアプリ名だけです。他の項目とファイルは、後日このポータルの編集画面からいつでも追記・追加できます。まずは登録だけでもOKです。') + '</p>' +
+        : '必須は氏名・アプリ名・アプリ概要だけです。他の項目とファイルは、後日このポータルの編集画面からいつでも追記・追加できます。まずは登録だけでもOKです。') + '</p>' +
       '<form id="submission-form" novalidate>' +
         (isEdit ? '<input type="hidden" name="editId" value="' + editItem.id + '">' : '') +
         '<div class="form-row">' +
@@ -557,7 +551,7 @@ function renderFormView(editId) {
           '<div class="form-error" id="err-title"></div>' +
         '</div>' +
         '<div class="form-row">' +
-          '<label>アプリ概要</label>' +
+          '<label>アプリ概要<span class="required">必須</span></label>' +
           '<div class="form-note">どんなことができるアプリかを書いてください。READMEの流用OK。</div>' +
           '<textarea name="gaiyo" rows="8">' + (isEdit ? escapeHtml(editItem.gaiyo) : '') + '</textarea>' +
           '<div class="form-error" id="err-gaiyo"></div>' +
@@ -636,6 +630,7 @@ function handleFormSubmit(form, route) {
 
   if (!isEdit && shimei === '') { setFieldError('shimei', '氏名を入力してください'); hasError = true; }
   if (title === '') { setFieldError('title', 'アプリ名を入力してください'); hasError = true; }
+  if (gaiyo === '') { setFieldError('gaiyo', 'アプリ概要を入力してください'); hasError = true; }
 
   function checkFile(key, isReplace) {
     var file = data.get(key);
