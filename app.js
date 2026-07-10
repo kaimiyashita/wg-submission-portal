@@ -396,7 +396,7 @@ function renderListView() {
     var gaiyoText = it.gaiyo && it.gaiyo.trim() !== '' ? escapeHtml(it.gaiyo) : '(アプリ概要は未登録です)';
     return '' +
       '<div class="card">' +
-        '<div class="thumb" style="background:' + placeholderColor(it.shimei) + '">' + escapeHtml(it.shimei || '?') + '</div>' +
+        '<div class="thumb" style="background:' + placeholderColor(it.shimei) + '">' + escapeHtml(it.title || '?') + '</div>' +
         '<div class="body">' +
           '<span class="status-badge ' + status.cls + '">' + status.label + '</span>' +
           '<div class="app-name">' + escapeHtml(it.title) + '</div>' +
