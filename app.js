@@ -392,12 +392,11 @@ function renderListView() {
 
   var cardsHtml = items.map(function (it) {
     var status = getStatus(it.files);
-    var initials = (it.shimei || '?').slice(0, 1);
     var isOwn = myShimei !== '' && it.shimei === myShimei;
     var gaiyoText = it.gaiyo && it.gaiyo.trim() !== '' ? escapeHtml(it.gaiyo) : '(アプリ概要は未登録です)';
     return '' +
       '<div class="card">' +
-        '<div class="thumb" style="background:' + placeholderColor(it.shimei) + '">' + escapeHtml(initials) + '</div>' +
+        '<div class="thumb" style="background:' + placeholderColor(it.shimei) + '">' + escapeHtml(it.shimei || '?') + '</div>' +
         '<div class="body">' +
           '<span class="status-badge ' + status.cls + '">' + status.label + '</span>' +
           '<div class="app-name">' + escapeHtml(it.title) + '</div>' +
@@ -560,6 +559,7 @@ function renderFormView(editId) {
         fileRow('md', 'レポート(md)', isEdit ? editItem.files.md : false) +
         fileRow('pptx', '発表資料(pptx)', isEdit ? editItem.files.pptx : false) +
         '<button type="submit" class="btn" id="submit-btn">' + (isEdit ? '更新する' : '送信する') + '</button>' +
+        (isEdit ? '<a href="#/app/' + editItem.id + '" class="btn secondary">更新せずに戻る</a>' : '') +
       '</form>' +
     '</div>';
 }
