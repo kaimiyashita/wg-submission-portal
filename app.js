@@ -196,7 +196,7 @@ function fileToBase64(file) {
    3.5 Power Automateフロー連携層
    直接SharePointを叩かず、2つのフローURLを呼ぶ
    ========================================================= */
-function fetchListData() {
+function fetchListDataOnce() {
   return fetch(CONFIG.listFlowUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -204,7 +204,19 @@ function fetchListData() {
   }).then(function (res) {
     if (!res.ok) throw new Error('HTTP_' + res.status);
     return res.json();
-  }).then(function (data) {
+  });
+}
+
+function fetchListDataWithRetry(retriesLeft) {
+  return fetchListDataOnce().catch(function (err) {
+    if (retriesLeft <= 0) throw err;
+    return new Promise(function (resolve) { setTimeout(resolve, 1500); })
+      .then(function () { return fetchListDataWithRetry(retriesLeft - 1); });
+  });
+}
+
+function fetchListData() {
+  return fetchListDataWithRetry(2).then(function (data) {
     return (data.items || []).map(function (raw) {
       var attachments = raw.attachments || { zip: null, md: null, pptx: null };
       return {
