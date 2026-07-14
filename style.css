@@ -15,6 +15,7 @@
   --color-waiting-bg: #fdf3d8;
 }
 * { box-sizing: border-box; }
+button { font: inherit; }
 body {
   margin: 0;
   font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
@@ -169,6 +170,8 @@ main#app {
 .complete-screen { text-align: center; padding: 40px 20px; }
 .complete-screen .icon { font-size: 3rem; color: var(--color-complete); }
 .complete-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+.form-actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.form-actions .btn { width: 114px; padding-left: 0; padding-right: 0; text-align: center; }
 .error-box {
   background: #fdecea;
   border: 1px solid var(--color-danger);

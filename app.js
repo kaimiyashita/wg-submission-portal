@@ -570,8 +570,10 @@ function renderFormView(editId) {
         fileRow('zip', 'ソースコード(zip)', isEdit ? editItem.files.zip : false) +
         fileRow('md', 'レポート(md)', isEdit ? editItem.files.md : false) +
         fileRow('pptx', '発表資料(pptx)', isEdit ? editItem.files.pptx : false) +
-        '<button type="submit" class="btn" id="submit-btn">' + (isEdit ? '更新する' : '送信する') + '</button>' +
-        (isEdit ? '<a href="#/app/' + editItem.id + '" class="btn secondary">更新せずに戻る</a>' : '') +
+        '<div class="form-actions">' +
+          '<button type="submit" class="btn" id="submit-btn">' + (isEdit ? '更新する' : '送信する') + '</button>' +
+          (isEdit ? '<a href="#/" class="btn secondary">一覧へ戻る</a>' : '') +
+        '</div>' +
       '</form>' +
     '</div>';
 }
