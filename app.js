@@ -278,9 +278,7 @@ function submitToFlow(isEdit, editId, fields, fileState) {
       pptx: prevFiles.pptx || !!fileEntries.pptx
     };
     if (isEdit) {
-      existing.title = fields.cleanTitle;
-      existing.gaiyo = fields.gaiyo;
-      existing.files = newFiles;
+      REAL_ITEMS = null;
       navigate('#/app/' + existing.id);
     } else {
       var newItem = {
