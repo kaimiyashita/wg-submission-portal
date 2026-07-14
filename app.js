@@ -278,8 +278,10 @@ function submitToFlow(isEdit, editId, fields, fileState) {
       pptx: prevFiles.pptx || !!fileEntries.pptx
     };
     if (isEdit) {
-      REAL_ITEMS = null;
-      navigate('#/app/' + existing.id);
+      setTimeout(function () {
+        REAL_ITEMS = null;
+        navigate('#/app/' + existing.id);
+      }, 1500);
     } else {
       var newItem = {
         id: data.id,
