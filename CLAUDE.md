@@ -1,21 +1,23 @@
 # AIコーディングWG 成果物ポータル 仕様書
 
-作成日: 2026-07-02 / 版: 2.0(ノーコード方式へ転換) / 初版: 1.0(単一HTML SPA方式、2026-07-03に保留)
+作成日: 2026-07-02 / 最終更新: 2026-07-09 / 版: 1.1(GitHub Pages方式・現行) / 旧版: 2.0(ノーコード方式、計画のみで未実施) / 初版: 1.0(単一HTML SPA方式、SharePoint直埋め込みは2026-07-03に断念)
 目的: WGメンバー約20名が2026-07-24までに成果物(アプリ)を提出・相互閲覧するためのポータル。
 
 ---
 
-## 0. 方針転換の経緯(重要)
+## 0. 現状(重要・2026-07-09更新)
 
-当初、単一HTMLファイルのSPAをSharePointサイトに配置しSharePoint REST APIで連携する方式(旧1.0仕様、[`CLAUDE_v1_html-spa-archive.md`](CLAUDE_v1_html-spa-archive.md) に分離保存)で開発を進めていたが、実機検証の結果、**このSharePointサイト(モダンサイト)ではドキュメントライブラリに置いたHTMLファイルが常にサンドボックス化されたプレビューiframeで開かれ、カスタムスクリプトが実質的に機能しない**ことが判明した(2026-07-03、コンソールログでCSP違反・`about:srcdoc`を確認)。
+**現在実際に稼働している方式は、末尾の9章に記載する「GitHub Pages方式」です。** 以下の経緯を踏まえて読んでください。
 
-回避策(サイトアセット代替ライブラリへの配置→権限不足で失敗、外部ホスティング+OAuth化→大幅な作り替えと社内URL露出等の懸念)も検討したが、いずれも管理者権限が必要、または新たなリスクを伴うため、**カスタムHTMLアプリ方式を断念**し、**SharePoint標準機能(リスト+モダンページのWebパーツ)のみで完結するノーコード方式**に転換した。
+1. 当初、単一HTMLファイルのSPAをSharePointサイトのドキュメントライブラリに直接配置しSharePoint REST APIで連携する方式(初版1.0、[`CLAUDE_v1_html-spa-archive.md`](CLAUDE_v1_html-spa-archive.md))で開発していたが、**SharePointのモダンサイトではHTMLファイルが常にサンドボックス化されたプレビューiframeで開かれ、カスタムスクリプトが実質的に機能しない**ことが判明し(2026-07-03)、断念した。
+2. その後、SharePoint標準機能(リスト+モダンページのWebパーツ)のみで完結する「版2.0(ノーコード方式)」への転換を計画し、2〜8章に詳細仕様として書き残した。**しかしこの版2.0は実際にはセットアップ・移行されておらず、計画止まりで終わっている**(7章のセットアップチェックリストも未着手のまま)。
+3. 実際には、**版1.0のSPA(`app.js`/`index.html`/`style.css`)を、SharePointに埋め込むのではなくGitHub Pagesで独立ホスティングし、Power Automateの2本のクラウドフロー(`submitFlowUrl`/`listFlowUrl`)経由でSharePointリストの読み書き・添付ファイル操作を行う形**で開発が継続され、現在も現役で稼働・テストされている(2026-07-09時点、複数のバグ修正を実施・動作確認済み)。SharePoint直埋め込み時代の問題(サンドボックスiframe)は、ページをSharePoint外(GitHub Pages)に置くことで回避できている。
 
-以降がノーコード方式(版2.0)の仕様。
+**1〜8章(版2.0ノーコード仕様)は未実施の計画として参考用に残すが、実装・運用の判断材料にはしないこと。** 現行のアーキテクチャ・データ設計は末尾の**9章**を参照。
 
 ---
 
-## 1. アーキテクチャ(確定・版2.0)
+## 1. アーキテクチャ(旧計画・版2.0、未実施)
 
 - **コード・ビルドなし**。SharePointの標準機能(リスト+モダンページ+Webパーツ)のみで構成
 - 認証・サーバー不要。SharePointの標準権限機構にそのまま乗る
@@ -125,6 +127,21 @@
 
 ---
 
-## 付録: 旧仕様(版1.0・単一HTML SPA方式)
+## 9. 現行アーキテクチャ(版1.1・GitHub Pages方式、2026-07-09時点)
 
-保留中の旧仕様(単一HTMLファイルSPA + SharePoint REST API方式)は別ファイル [`CLAUDE_v1_html-spa-archive.md`](CLAUDE_v1_html-spa-archive.md) に分離した。実装コード自体(Phase 1完成・Phase 2 REST接続層実装済み・未検証)は `wg-submission-portal/index.html` にそのまま残っている。将来、サイト管理者に「カスタムスクリプトを許可」設定を有効化してもらえた場合、またはPower Apps/外部ホスティング等への転換を再検討する場合に参照すること。
+- **ホスティング**: このGitHubリポジトリ(`kaimiyashita/wg-submission-portal`)を**GitHub Pages**で公開。`main`ブランチへのpushが自動でビルド・デプロイをトリガーする(GitHub Actions「pages build and deployment」)。デプロイ後、CDNキャッシュにより反映まで数分かかることがある
+- **画面本体**: `index.html` + `app.js` + `style.css`。旧1.0仕様([`CLAUDE_v1_html-spa-archive.md`](CLAUDE_v1_html-spa-archive.md))がベースだが、SharePointサイトへの直接埋め込みをやめてGitHub Pages単独ホスティングにすることで、0章記載のサンドボックスiframe問題を回避している
+- **データ連携**: `app.js`はSharePoint REST APIを直接叩かず、**Power Automateのクラウドフロー2本**を経由する
+  - `submitFlowUrl`: 新規作成・更新、添付ファイル(zip/md/pptx)の追加・差し替えを担当。HTTPトリガー(認証「Anyone」、URLの`sig=`署名のみで呼び出せる)
+  - `listFlowUrl`: 一覧・詳細表示用に、リスト全アイテムと添付ファイル情報をまとめて1つのJSONで返す。同じくHTTPトリガー
+  - 両フローの実体はPower Automate上にのみ存在し、リポジトリ内にはエクスポート等の形で保存されていない。変更は必ずPower Automateデザイナー上で直接行う
+- **データストア**: SharePointサイト「金融AI活用コミュニティ-CR統括AIコーディングWG」(`https://tdcsoft.sharepoint.com/sites/AI-CRAIWG`)のリスト「`GitHubCopilot_成果物リスト`」。添付ファイル(zip/md/pptx)はリスト標準の添付ファイル機能を使い、**提出者が付けた元のファイル名のまま**登録される(2026-07-09修正。旧実装は`source.zip`等の固定名にリネームしていた)
+- **既知の未解決事項**:
+  - `submitFlowUrl`/`listFlowUrl`のURL(署名付き)が`app.js`にハードコードされている。事実上の認証情報であり、リポジトリが公開状態だと誰でも呼び出せてしまう
+  - `git push`はこの開発環境(Claude Code実行環境)からは認証情報が無く実行できない。ユーザー自身の端末(個人アクセストークン等を設定済み)で実行する必要がある(ルート`CLAUDE.md`の禁止事項も参照)
+
+---
+
+## 付録: 旧仕様(版1.0・単一HTML SPA方式、SharePoint直埋め込み案)
+
+SharePoint直埋め込みを断念した経緯を含む旧仕様は別ファイル [`CLAUDE_v1_html-spa-archive.md`](CLAUDE_v1_html-spa-archive.md) に分離保存している。当時の実装コード(`index.html`/`app.js`/`style.css`)は、9章記載のとおりGitHub Pages方式に転用され、そのまま現行の本体コードとして使われている。

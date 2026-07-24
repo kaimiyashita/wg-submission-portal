@@ -121,8 +121,11 @@ function getStatus(files) {
 function placeholderColor(name) {
   var s = String(name || '');
   var hash = 0;
-  for (var i = 0; i < s.length; i++) { hash = (hash * 31 + s.charCodeAt(i)) % 360; }
-  return 'hsl(' + hash + ', 55%, 55%)';
+  for (var i = 0; i < s.length; i++) {
+    hash = ((hash << 5) - hash + s.charCodeAt(i)) | 0;
+  }
+  var hue = Math.abs(hash) % 360;
+  return 'hsl(' + hue + ', 55%, 55%)';
 }
 
 var REAL_ITEMS = null;

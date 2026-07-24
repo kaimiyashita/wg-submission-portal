@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Teams議事録自動化RPA_レポート.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="teams議事録自動化rpa">Teams議事録自動化RPA</h1>
+<div style="border:1px solid #cccccc;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#757575;color:#ffffff;font-weight:bold;padding:10px 18px;">📋 アプリ概要</div>
+<div style="background:#f8f8f8;padding:16px 20px;">
+Teams会議の録画からWord形式のトランスクリプトを取得し、M365 Copilot Chatの議事録エージェントに投入、生成された議事録をOneNoteの新規ページに貼り付けるところまでを自動化するツール。ボタン1つでSharePointからダウンロード→Copilotエージェント投入→OneNote記載まで一気に実行される。
+</div>
+</div>
+<div style="border:1px solid #bcd8f2;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#3d85c6;color:#ffffff;font-weight:bold;padding:10px 18px;">🔍 発見したこと</div>
+<div style="background:#eaf3fc;padding:16px 20px;">
+着手前は「会議の録画からWordのトランスクリプトを取得する」としか認識していなかったが、いきなり実装に入らずAIと壁打ちしながら実際の操作手順を洗い出したところ、想定と違う実態が見えてきた。
+<div style="background:#ffffff;border-left:3px solid #3d85c6;border-radius:4px;padding:10px 16px;margin:14px 0;font-style:italic;color:#333333;">
+❝ 「単独のWordファイルが存在する」という前提は誤りで、実際は録画を開いた先の文字起こしパネルから、その場でWord形式をダウンロードする仕組みだった。
+</div>
+この実態を先に具体化できていなければ、存在しないファイルを探すコードを書いて手戻りしていたと思う。
+</div>
+</div>
+<div style="border:1px solid #f0dfa0;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#b8860b;color:#ffffff;font-weight:bold;padding:10px 18px;">💡 気づき</div>
+<div style="background:#fff8e1;padding:16px 20px;">
+最初から実装コードを書かせるのではなく、まず壁打ちで処理フローをAIと一緒に洗い出し、調査で分かったことを具体化した仕様にしてから実装に入る、という順番が結局は一番の近道だと気づいた。<br><br>
+コードを書き始めてしまうと、そのコードの前提を疑う視点が失われがちになる。<strong>書く前にどれだけ実態を具体化できているかが、理想に近いアプリを作れるかどうかを左右する</strong>と感じた。
+</div>
+</div>
+<div style="border:1px solid #b7e0c7;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#3f9d6d;color:#ffffff;font-weight:bold;padding:10px 18px;">📚 理解したこと</div>
+<div style="background:#eaf7ee;padding:16px 20px;">
+具体化してから進める姿勢は、最初の要件整理だけでなく、実装の途中でも同じように効くと理解した。
+<div style="background:#ffffff;border-left:3px solid #4caf7d;border-radius:4px;padding:10px 16px;margin:14px 0;font-style:italic;color:#333333;">
+❝ ファイル添付が完了すると出る「アップロードが完了しました」という通知表示について、AIは「一時的な通知だからすぐ消えるはずで、待機条件には使えない」と推測し、別の実装方法を探し始めた。実際に試してみると、通知は画面に残り続けていて、そのまま待機条件として使えた。
+</div>
+大きな設計判断も、細かい実装判断も、<strong>推測で先に進めず一度具体的に確かめる</strong>、という同じ姿勢が効いていた。
+</div>
+</div>
+<hr>
+<div style="font-weight:bold;font-size:16px;color:#444444;border-bottom:2px solid #8e44ad;padding-bottom:6px;margin:8px 0 16px 0;">🧾 プロンプトのレシピ</div>
+<div style="border:1px solid #ddc7ec;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#8e44ad;color:#ffffff;font-weight:bold;padding:10px 18px;">📝 レシピ1: 一括で全部作らせず、フェーズごとに1つずつ動作確認してもらう</div>
+<div style="background:#f6f0fb;padding:18px 22px;">
+<div style="margin-bottom:14px;">
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">使ったシーン</span><br><br>
+「SharePointから文字起こしを取得→Copilotに投入→OneNoteに貼り付け」という3フェーズ構成のツールを作った際、3フェーズ分をまとめて一気に実装させようとすると、どこで壊れているのか分からなくなりそうだった。
+</div>
+<div style="margin-bottom:14px;">
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">プロンプト</span>
+<pre style="background:#2d2d2d;padding:14px 16px;border-radius:6px;overflow-x:auto;margin:8px 0 0 0;"><code style="color:#f5f5f5;background:transparent;">3つのフェーズを一気に全部実装しないこと。
+まずSharePointフェーズだけ実装し、動作確認できたら報告すること。
+確認が取れたら次のフェーズに進み、以降も1フェーズごとに確認してから次に進むこと。</code></pre>
+</div>
+<div>
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">なぜ使えたか</span><br><br>
+複数フェーズをまとめて実装させると、どこで問題が起きているのか切り分けが難しくなる。フェーズを1つずつ区切って、その都度動作確認してから次に進める、という進め方にしたことで、各フェーズごとの不具合(パネルの誤クローズ、添付完了待ちの判定など)をその場で潰しながら進められ、最終的に3フェーズ通しでの成功にたどり着けた。
+</div>
+</div>
+</div>
+<div style="border:1px solid #ddc7ec;border-radius:8px;overflow:hidden;margin:12px 0 24px 0;">
+<div style="background:#8e44ad;color:#ffffff;font-weight:bold;padding:10px 18px;">📝 レシピ2: コード修正の箇所が特定できている際は「他は一切変更しないこと」と明示する</div>
+<div style="background:#f6f0fb;padding:18px 22px;">
+<div style="margin-bottom:14px;">
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">使ったシーン</span><br><br>
+特定の処理だけを直してほしい場面で、AIに修正を頼んだところ、対象箇所以外の周辺コードまで「ついでに」整理・変更されてしまい、意図しない変更が混ざってしまったことがあった。
+</div>
+<div style="margin-bottom:14px;">
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">プロンプト</span>
+<pre style="background:#2d2d2d;padding:14px 16px;border-radius:6px;overflow-x:auto;margin:8px 0 0 0;"><code style="color:#f5f5f5;background:transparent;">指定した箇所だけ修正すること。
+それ以外の箇所には一切変更を加えないこと。</code></pre>
+</div>
+<div>
+<span style="display:inline-block;background:#8e44ad;color:#ffffff;font-weight:bold;font-size:12px;padding:2px 10px;border-radius:12px;">なぜ使えたか</span><br><br>
+「ここを直して」のような曖昧な指示だと、AIは対象箇所だけでなく他の不要な箇所まで巻き込んで修正してしまうことがある。修正範囲を明示的に制御しないと、意図しない差分が混ざりやすい。「他は一切変更しないこと」と範囲を先に区切っておくことで、変更の影響範囲を狙った箇所だけに限定できた。
+</div>
+</div>
+</div>
+
+</body>
+</html>
